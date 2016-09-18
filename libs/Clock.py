@@ -185,10 +185,12 @@ def test2():
     clock.setPoint(True)
     clock.start();
     start_time = time.time()
-    for n in range(2000):
-        clock.writeNumberString(str(n))
+    for n in range(2001
+    ):
+        clock.writeNumberString(str(2000-n))
         time.sleep(0.01)
     print ( str((time.time() - start_time))+" sec.")
+    time.sleep(3)
     clock.stop()
 
 
@@ -198,5 +200,5 @@ def test2():
 
 
 #test della classe
-
-#test2()
+if __name__ == "__main__":
+    test2()
