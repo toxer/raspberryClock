@@ -1,5 +1,6 @@
 
 import cherrypy
+import simplejson
 
 songs = {
     '1': {
@@ -21,18 +22,18 @@ songs = {
 class Songs:
     exposed = True
 
-    
+
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
     def POST(self):
         input_json = cherrypy.request.json
-        print(input_json)
         id = input_json["id"]
         if id == None:
             return('Here are all the songs we have: %s' % songs)
         elif id in songs:
             song = songs[id]
-            return('Song with the ID %s is called %s, and the artist is %s' % (id, song['title'], song['artist']))
+            return simplejson.dumps({'song':song['title']})
+            #return('Song with the ID %s is called %s, and the artist is %s' % (id, song['title'], song['artist']))
         else:
             return('No song with the ID %s :-(' % id)
 
