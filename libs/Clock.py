@@ -31,13 +31,13 @@ class Clock (threading.Thread):
 
     LINES ={'L1':LED(L1),'L2':LED(L2),'L3':LED(L3),'L4':LED(L4)}
     SEGMENTS = {'A':LED(A),'B':LED(B),'C':LED(C),'D':LED(D),'E':LED(E),'F':LED(F),'G':LED(G),'P':LED(P)}
-    NUMBERS = {'0':['A','B','C','D','E','F'],'1':['B','C'],'2':['A','B','G','E','D'],'3':['A','B','G','C','D'],'4':['F','B','G','C'],'5':['A','C','D','F','G'],'6':['A','C','D','F','G','E'],'7':['A','C','B'],'8':['A','B','C','D','E','F','G'],'9':['A','B','C','D','F','G']}
-
+    NUMBERS = {'0':['A','B','C','D','E','F'],'1':['B','C'],'2':['A','B','G','E','D'],'3':['A','B','G','C','D'],'4':['F','B','G','C'],'5':['A','C','D','F','G'],'6':['A','C','D','F','G','E'],'7':['A','C','B'],'8':['A','B','C','D','E','F','G'],'9':['A','B','C','D','F','G'],'E':['G']}
     def __init__(self):
         threading.Thread.__init__(self)
         self.number = None
         self.numberString=None
         self.__point=None
+        self.__error=None
 
 
 
@@ -86,7 +86,14 @@ class Clock (threading.Thread):
     def setPoint(self, value):
         self.__point = value
 
+    def switchPoint(self):
+        self.__point = not self.__point
 
+    def showError(self,error):
+        if (error == True):
+            self.__error=True
+        else:
+            self.__error=None
 
 
 
@@ -94,7 +101,25 @@ class Clock (threading.Thread):
         self.started = True
         self.pointOn(False)
         while self.started:
-            if (self.number != None or self.numberString != None):
+            #in caso di errore non mostro il numero
+            if self.__error==True:
+                self.lineOn('L4')
+                self.segmentOn(self.NUMBERS['E'])
+                time.sleep(self.SWITCH_TIME)
+                self.switchOff()
+                self.lineOn('L3')
+                self.segmentOn(self.NUMBERS['E'])
+                time.sleep(self.SWITCH_TIME)
+                self.switchOff()
+                self.lineOn('L2')
+                self.segmentOn(self.NUMBERS['E'])
+                time.sleep(self.SWITCH_TIME)
+                self.switchOff()
+                self.lineOn('L1')
+                self.segmentOn(self.NUMBERS['E'])
+                time.sleep(self.SWITCH_TIME)
+                self.switchOff()
+            elif (self.number != None or self.numberString != None):
                 cifra1='0'
                 cifra2='0'
                 cifra3='0'
@@ -146,6 +171,7 @@ class Clock (threading.Thread):
                 self.switchOff()
             else:
                 time.sleep(self.SWITCH_TIME)
+        print("Coda clock terminata")
 
 
 
@@ -180,17 +206,18 @@ def test3():
     clock.stop()
 
 def test2():
-
+    number = 500
     clock =  Clock();
     clock.setPoint(True)
     clock.start();
     start_time = time.time()
-    for n in range(2001
-    ):
-        clock.writeNumberString(str(2000-n))
+    for n in range(number+1):
+        clock.writeNumberString(str(number-n))
         time.sleep(0.01)
     print ( str((time.time() - start_time))+" sec.")
-    time.sleep(3)
+    time.sleep(1)
+    clock.showError(True)
+    time.sleep(2)
     clock.stop()
 
 

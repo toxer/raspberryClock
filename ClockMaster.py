@@ -1,26 +1,38 @@
 import threading
 import time
 import sys
+import signal
+
+
 sys.path.append("./libs")
 
 from Clock import Clock
 from Ntp import Ntp
+from Server import ClockServer
+
+
 
 class ClockMaster(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.clock = Clock()
         self.clock.setPoint(True)
+        self.clock.showError(True)
+        self.server = ClockServer(9090)
+        self.started=False
         self.ntp = Ntp()
 
-
+    def stop(self):
+        self.started=False
 
 
     def run(self):
         self.clock.start()
         self.ntp.start()
+        self.started=True
 
-        while True:
+
+        while self.started:
             if (self.ntp.time != None):
                 number = None
                 h = self.ntp.time.hour
@@ -36,8 +48,29 @@ class ClockMaster(threading.Thread):
                     number = number + str(m)
                 self.clock.writeNumberString(number)
             time.sleep(1)
+            self.clock.switchPoint();
             if (self.ntp.time != None):
-                self.ntp.addSecond()
+                if (self.ntp.error == False):
+                    self.clock.showError(False)
+                    self.ntp.addSecond()
+                else:
+                    self.clock.showError(True);
+        print("Coda principale terminata")
 
 clockMaster = ClockMaster()
+
+def terminate(signal, frame):
+    try:
+        
+        clockMaster.clock.switchOff();
+        clockMaster.clock.stop()
+        clockMaster.ntp.stop();
+        clockMaster.stop()
+    except:
+        print("Eccezione")
+        print(sys.exc_info()[0])
+    finally:
+        sys.exit(0)
+signal.signal(signal.SIGINT, terminate)
 clockMaster.start()
+signal.pause()
