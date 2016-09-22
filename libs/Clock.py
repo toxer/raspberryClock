@@ -24,7 +24,7 @@ class Clock (threading.Thread):
     L3 = 13
     L4 = 19
 
-    SWITCH_TIME=0.0001
+    SWITCH_TIME=0.00001
     started = False
 
 
@@ -60,6 +60,13 @@ class Clock (threading.Thread):
             else:
                 self.LINES[L].off()
 
+    def allSegmentOff(self):
+        for S in self.SEGMENTS.keys():
+            self.SEGMENTS[S].on();
+    def allLineOff(self):
+        for L in self.LINES.keys():
+            self.LINES[L].off();
+
     def segmentOn(self,segments):
         for S in self.SEGMENTS.keys():
             if S in segments:
@@ -80,8 +87,8 @@ class Clock (threading.Thread):
 
 
     def switchOff(self):
-        self.lineOn([])
-        self.segmentOn([])
+        self.allLineOff();
+        self.allSegmentOff();
 
     def setPoint(self, value):
         self.__point = value
@@ -161,7 +168,6 @@ class Clock (threading.Thread):
                     if self.__point != None:
                         self.pointOn(self.__point)
                     time.sleep(self.SWITCH_TIME)
-
                     self.switchOff()
                 if cifra4 != None:
                     self.lineOn('L1')

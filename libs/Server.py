@@ -7,16 +7,26 @@ class UpdateNtp:
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
     def POST(self):
-        input_json = cherrypy.request.json
-        print("REQUEST")
-        print(input_json["id"])
+        self.clockMaster.updateNtp();
 
+class KillServer:
+    def __init__(self,clockMaster):
+        self.clockMaster=clockMaster
+    exposed = True
+    def GET(self):
+        self.clockMaster.killServer();
 
 class ClockServer:
     def __init__(self,port,clockMaster):
         self.clockMaster = clockMaster
         cherrypy.tree.mount(
             UpdateNtp(), '/api/clock/udpateNtp',
+            {'/':
+                {'request.dispatch': cherrypy.dispatch.MethodDispatcher()}
+            }
+        )
+        cherrypy.tree.mount(
+            KillServer(self.clockMaster), '/api/clock/killServer',
             {'/':
                 {'request.dispatch': cherrypy.dispatch.MethodDispatcher()}
             }

@@ -34,9 +34,6 @@ class Ntp(threading.Thread):
                 t+=1
                 time.sleep(1)
             t = 0;
-
-
-
         print("Coda ntp terminata")
 
 
