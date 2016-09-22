@@ -2,7 +2,7 @@ import cherrypy
 import simplejson
 
 
-class ServerRequest:
+class UpdateNtp:
     exposed = True
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
@@ -13,9 +13,10 @@ class ServerRequest:
 
 
 class ClockServer:
-    def __init__(self,port):
+    def __init__(self,port,clockMaster):
+        self.clockMaster = clockMaster
         cherrypy.tree.mount(
-            ServerRequest(), '/api/clock/prova',
+            UpdateNtp(), '/api/clock/udpateNtp',
             {'/':
                 {'request.dispatch': cherrypy.dispatch.MethodDispatcher()}
             }

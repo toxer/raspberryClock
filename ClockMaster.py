@@ -26,6 +26,23 @@ class ClockMaster(threading.Thread):
         self.started=False
 
 
+    def updateNtp(self):
+        if (self.ntp.time != None):
+            number = None
+            h = self.ntp.time.hour
+            m = self.ntp.time.minute
+            if h < 10:
+                number = '0'+str(h)
+            else:
+                number = str(h)
+
+            if m < 10:
+                number = number + '0'+str(m)
+            else:
+                number = number + str(m)
+            self.clock.writeNumberString(number)
+
+
     def run(self):
         self.clock.start()
         self.ntp.start()
@@ -33,20 +50,7 @@ class ClockMaster(threading.Thread):
 
 
         while self.started:
-            if (self.ntp.time != None):
-                number = None
-                h = self.ntp.time.hour
-                m = self.ntp.time.minute
-                if h < 10:
-                    number = '0'+str(h)
-                else:
-                    number = str(h)
-
-                if m < 10:
-                    number = number + '0'+str(m)
-                else:
-                    number = number + str(m)
-                self.clock.writeNumberString(number)
+            self.updateNtp()
             time.sleep(1)
             self.clock.switchPoint();
             if (self.ntp.time != None):
@@ -61,7 +65,7 @@ clockMaster = ClockMaster()
 
 def terminate(signal, frame):
     try:
-        
+
         clockMaster.clock.switchOff();
         clockMaster.clock.stop()
         clockMaster.ntp.stop();
